@@ -482,7 +482,10 @@ public final class RouterUtil {
         }
         return routeNodeSet;
     }
-
+    
+    /**
+     * 尝试路由多个表到一个节点。
+     */
     public static String tryRouteTablesToOneNode(String user, RouteResultset rrs, SchemaConfig schemaConfig, DruidShardingParseInfo ctx, Set<String> schemaList, int tableSize, boolean isSelect) throws SQLException {
         if (ctx.getTables().size() != tableSize) {
             return null;
@@ -519,7 +522,10 @@ public final class RouterUtil {
                     } else if (schema.getTables().get(tableName).getDataNodes().size() == 1) {
                         tmpResultNodes.add(schema.getTables().get(tableName).getDataNodes().get(0));
                         tablesSet.remove(tableName);
-                        if (tmpResultNodes.size() != 1) {
+                        if (tmpResultNodes.size() == 2 ) {
+                        	tmpResultNodes.remove(schema.getDataNode());
+                        }
+                        if (tmpResultNodes.size() != 1 ) {
                             return null;
                         }
                     } else {
