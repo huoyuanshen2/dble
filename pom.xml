@@ -285,7 +285,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>*.dtd</include>
+                    <include>*.*</include>
                 </includes>
             </resource>
             <resource>
