@@ -496,35 +496,11 @@ public final class RouterUtil {
 			return null;
 		}
 		Set<String> resultNodes = new HashSet<>();
-		AbstractPartitionAlgorithm algorithm = null;
+		
 
-		String tableNamePlus = "mycat_plus_config"; // 自定义核心配置表
-		TableConfig tableConfigTmp = schemaConfig.getTables().get(tableNamePlus);
-		if (tableConfigTmp != null) {
-			algorithm = tableConfigTmp.getRule().getRuleAlgorithm();
-		}
-		// 为增量分库表找路由
-		Integer maxIdx = -1;
-		List<Condition> conditions = ctx.getVisitor().getConditions();
-		Map<String, String> tableAliasMap = ctx.getTableAliasMap();
-		for (Condition condition : conditions) {
-			Column column = condition.getColumn();
-			String tableName = tableAliasMap.get(column.getTable()).toUpperCase();
-			String colName = column.getName().toUpperCase();
-			Integer nodeIndex = algorithm.calculateRangePlus(tableName, colName, condition.getValues());
-			if (nodeIndex != null && nodeIndex > maxIdx) {
-				maxIdx = nodeIndex;
-			}
-		}
-		if (maxIdx != -1) {
-			ArrayList<String> dataNodes = tableConfigTmp.getDataNodes();
-			String node = null;
-			if (maxIdx >= 0 && maxIdx < dataNodes.size()) {
-				node = dataNodes.get(maxIdx);
-				if (node != null) {
-					return node;
-				}
-			}
+		String nodeStr = extentChenk(schemaConfig, ctx);
+		if(null !=nodeStr ) {
+			return nodeStr;
 		}
 
 		for (RouteCalculateUnit routeUnit : ctx.getRouteCalculateUnits()) {
@@ -602,6 +578,41 @@ public final class RouterUtil {
 			return null;
 		}
 		return resultNodes.iterator().next();
+	}
+
+	/**
+	 * 自定义方法：额外检查配置表：mycat_plus_config
+	 * @param schemaConfig
+	 * @param ctx
+	 * @return
+	 */
+	private static String extentChenk(SchemaConfig schemaConfig, DruidShardingParseInfo ctx) {
+		AbstractPartitionAlgorithm algorithm = null;
+		String tableNamePlus = "mycat_plus_config"; // 自定义核心配置表
+		TableConfig tableConfigTmp = schemaConfig.getTables().get(tableNamePlus);
+		if (tableConfigTmp != null) {
+			algorithm = tableConfigTmp.getRule().getRuleAlgorithm();
+		}
+		// 为增量分库表找路由
+		Integer maxIdx = -1;
+		List<Condition> conditions = ctx.getVisitor().getConditions();
+		Map<String, String> tableAliasMap = ctx.getTableAliasMap();
+		for (Condition condition : conditions) {
+			Column column = condition.getColumn();
+			String tableName = tableAliasMap.get(column.getTable()).toUpperCase();
+			String colName = column.getName().toUpperCase();
+			Integer nodeIndex = algorithm.calculateRangePlus(tableName, colName, condition.getValues());
+			if (nodeIndex != null && nodeIndex > maxIdx) {
+				maxIdx = nodeIndex;
+			}
+		}
+		if (maxIdx != -1) {
+			ArrayList<String> dataNodes = tableConfigTmp.getDataNodes();
+			if (maxIdx >= 0 && maxIdx < dataNodes.size()) {
+				return dataNodes.get(maxIdx);
+			}
+		}
+		return null;
 	}
 
 	private static boolean tryCalcNodeForShardingTable(RouteResultset rrs, Set<String> resultNodes,
@@ -1217,6 +1228,40 @@ public final class RouterUtil {
 		if (tbConfig == null && schemaConfig.getDataNode() != null) {
 			return schemaConfig.getDataNode();
 		}
+		
+		
+		
+		if (tbConfig != null && tbConfig.isNoSharding()) {
+			return tbConfig.getDataNodes().get(0);
+		}
+		return null;
+	}
+	
+	/**
+	 * 自定义方法，针对select查询，进行特殊判断。
+	 * @param ctx 
+	 * @param schemaConfig
+	 * @param tableName
+	 * @return
+	 * @throws SQLNonTransientException
+	 */
+	public static String isNoSharding4Select(DruidShardingParseInfo ctx, SchemaConfig schemaConfig, String tableName) throws SQLNonTransientException {
+		if (schemaConfig == null
+				|| ProxyMeta.getInstance().getTmManager().getSyncView(schemaConfig.getName(), tableName) != null) {
+			return null;
+		}
+		if (schemaConfig.isNoSharding()) { // schema without table
+			return schemaConfig.getDataNode();
+		}
+		String nodeStr = extentChenk(schemaConfig, ctx);
+		if(null !=nodeStr ) {
+			return nodeStr;
+		}
+		TableConfig tbConfig = schemaConfig.getTables().get(tableName);
+		if (tbConfig == null && schemaConfig.getDataNode() != null) {
+			return schemaConfig.getDataNode();
+		}
+		
 		if (tbConfig != null && tbConfig.isNoSharding()) {
 			return tbConfig.getDataNodes().get(0);
 		}
@@ -1268,4 +1313,6 @@ public final class RouterUtil {
 		Object o = WallVisitorUtils.getValue(expr);
 		return Boolean.FALSE.equals(o);
 	}
+
+
 }

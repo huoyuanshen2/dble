@@ -130,7 +130,8 @@ public class DruidSelectParser extends DefaultDruidParser {
         rrs.setStatement(RouterUtil.removeSchema(rrs.getStatement(), schemaInfo.getSchema()));
         SchemaConfig schema = schemaInfo.getSchemaConfig();
 
-        String noShardingNode = RouterUtil.isNoSharding(schema, schemaInfo.getTable());
+//        String noShardingNode = RouterUtil.isNoSharding(schema, schemaInfo.getTable());
+        String noShardingNode = RouterUtil.isNoSharding4Select(ctx,schema, schemaInfo.getTable());
         if ((mysqlSelectQuery.isForUpdate() || mysqlSelectQuery.isLockInShareMode()) && !sc.isAutocommit()) {
             rrs.setCanRunInReadDB(false);
         }
