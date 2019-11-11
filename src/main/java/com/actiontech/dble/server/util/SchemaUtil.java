@@ -148,6 +148,7 @@ public final class SchemaUtil {
         if (sqlSelectQuery instanceof MySqlSelectQueryBlock) {
             MySqlSelectQueryBlock mySqlSelectQueryBlock = (MySqlSelectQueryBlock) sqlSelectQuery;
             //CHECK IF THE SELECT LIST HAS INNER_FUNC IN,WITCH SHOULD BE DEAL BY DBLE
+            //检查select list中是否有需要被Dble稍后处理的inner_func函数，如有返回false。
             for (SQLSelectItem item : mySqlSelectQueryBlock.getSelectList()) {
                 if (item.getExpr() instanceof SQLMethodInvokeExpr) {
                     if (ItemCreate.getInstance().isInnerFunc(((SQLMethodInvokeExpr) item.getExpr()).getMethodName())) {
@@ -169,7 +170,18 @@ public final class SchemaUtil {
         SQLSelectQuery right = sqlSelectQuery.getRight();
         return isNoSharding(source, left, stmt, new SQLSelectStatement(new SQLSelect(left)), contextSchema, schemas, dataNode) && isNoSharding(source, right, stmt, new SQLSelectStatement(new SQLSelect(right)), contextSchema, schemas, dataNode);
     }
-
+    /**
+     * 判断库是否有配置分区信息。
+     * @param source
+     * @param tables
+     * @param stmt
+     * @param childSelectStmt
+     * @param contextSchema
+     * @param schemas
+     * @param dataNode
+     * @return
+     * @throws SQLException
+     */
     public static boolean isNoSharding(ServerConnection source, SQLTableSource tables, SQLStatement stmt, SQLStatement childSelectStmt, String contextSchema, Set<String> schemas, StringPtr dataNode)
             throws SQLException {
         if (tables != null) {

@@ -490,12 +490,19 @@ public class DruidSelectParser extends DefaultDruidParser {
         return groupByCols;
     }
 
+    /**
+     * 执行复杂sql（带有子查询）
+     * @param schemaName
+     * 未配置分区，routeToNoSharding
+		系统表,MysqlSystemSchemaHandler.handle
+		其他,tryRouteToOneNode
+     */
     private SchemaConfig executeComplexSQL(String schemaName, SchemaConfig schema, RouteResultset rrs, SQLSelectStatement selectStmt, ServerConnection sc, int tableSize)
             throws SQLException {
         StringPtr noShardingNode = new StringPtr(null);
         Set<String> schemas = new HashSet<>();
         if (SchemaUtil.isNoSharding(sc, selectStmt.getSelect().getQuery(), selectStmt, selectStmt, schemaName, schemas, noShardingNode)) {
-            return routeToNoSharding(schema, rrs, schemas, noShardingNode);
+            return routeToNoSharding(schema, rrs, schemas, noShardingNode); //优先noShardingNode，为null则schemas的随机节点。
         } else if (schemas.size() > 0 && SchemaUtil.MYSQL_SYS_SCHEMA.containsAll(schemas)) {
             MysqlSystemSchemaHandler.handle(sc, null, selectStmt.getSelect().getQuery());
             rrs.setFinishedExecute(true);

@@ -194,6 +194,10 @@ public class SchemaConfig {
         return fkErRelations;
     }
 
+    /**
+     * 得到随机节点
+     * @return
+     */
     public String getRandomDataNode() {
         if (this.allDataNodeStrArr == null) {
             return null;

@@ -87,6 +87,7 @@ public class DefaultDruidParser implements DruidParser {
         }
         Map<String, String> tableAliasMap = getTableAliasMap(visitor.getAliasMap());
         ctx.setRouteCalculateUnits(this.buildRouteCalculateUnits(tableAliasMap, visitor.getConditionList()));
+        ctx.setVisitor(visitor);
         return schema;
     }
 
@@ -207,13 +208,24 @@ public class DefaultDruidParser implements DruidParser {
         }
     }
 
+    /**
+     * 对于未配置分区表的路由
+     * @param schema
+     * @param rrs
+     * @param schemas
+     * @param dataNode
+     * @return
+     * 有指定dataNode则选取，否则使用schemas随机的一个。
+     */
     SchemaConfig routeToNoSharding(SchemaConfig schema, RouteResultset rrs, Set<String> schemas, StringPtr dataNode) {
-        String statement = rrs.getStatement();
+//        过滤sql中的schema信息。
+    	String statement = rrs.getStatement();
         for (String realSchema : schemas) {
             statement = RouterUtil.removeSchema(statement, realSchema);
         }
         statement = RouterUtil.removeSchema(statement, schema.getName());
         rrs.setStatement(statement);
+        
         String dataNodeTarget = dataNode.get();
         if (dataNodeTarget == null) {
             //no_name node

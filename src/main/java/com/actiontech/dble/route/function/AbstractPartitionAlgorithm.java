@@ -9,6 +9,7 @@ import com.actiontech.dble.config.model.rule.RuleAlgorithm;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,5 +86,15 @@ public abstract class AbstractPartitionAlgorithm implements RuleAlgorithm, Seria
     public Map<String, String> getAllProperties() {
         return propertiesMap;
     }
+    
+    /**
+     * 范围计算方法
+     * @param tableName
+     * @param colName
+     * @param values
+     * @return schema.xml中配置的单个表的角标。 datanode="n1,n2,n3"
+     */
+	public  Integer calculateRangePlus(String tableName, String colName, List<Object> values) {
+		return null;};
 
 }

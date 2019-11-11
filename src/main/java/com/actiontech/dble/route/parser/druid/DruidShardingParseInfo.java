@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.visitor.SchemaStatVisitor;
+
 /**
  * druid parser result
  *
@@ -25,6 +27,21 @@ public class DruidShardingParseInfo {
      * key table alias, value talbe realname;
      */
     private Map<String, String> tableAliasMap = new LinkedHashMap<>();
+    
+    /**
+     * 解析visitor对象
+     */
+    private SchemaStatVisitor visitor;
+
+	public void setVisitor(SchemaStatVisitor visitor) {
+
+		this.visitor = visitor;
+	}
+
+	public SchemaStatVisitor getVisitor() {
+
+		return this.visitor;
+	}
 
     public Map<String, String> getTableAliasMap() {
         return tableAliasMap;
