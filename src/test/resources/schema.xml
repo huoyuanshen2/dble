@@ -9,6 +9,12 @@
 	under the License. -->
 <!DOCTYPE dble:schema SYSTEM "schema.dtd">
 <dble:schema xmlns:dble="http://dble.cloud/">
+	<schema name="dbleDb" dataNode="G_plus_old">
+    	<table name="mycat_plus_config" dataNode="dn2,G_plus_old" rule="auto-sharding-long-plus" /> 
+		<table name="z_test03" dataNode="dn2"  /> 
+    </schema>
+    
+
 
     <schema name="cndb" checkSQLschema="true">
         <table name="offer" dataNode="offer_dn$0-127" rule="offerRule"/>
@@ -64,8 +70,14 @@
         <table name="offer1" dataNode="dn1"/>
     </schema>
 
-
+	<dataNode name="G_plus_old" dataHost="G_plus_old" database="dba_test"/>
+    <dataNode name="dn2" dataHost="pre_G_sjzzhhtdb" database="pre_g_full" />
+    
+    
+	<dataNode name="G+_old" dataHost="G+_old" database="dba_test"/>
+	
     <dataNode name="dn1" dataHost="localhost1" database="db1"/>
+    
     <dataNode name="dn2" dataHost="localhost1" database="db2"/>
     <dataNode name="dn3" dataHost="localhost1" database="db3"/>
     <dataNode name="cndb_dn" dataHost="localhost1" database="db4"/>
@@ -82,7 +94,23 @@
     <dataNode name="dnTest2" dataHost="localhost4" database="db2"/>
     <dataNode name="dnTest3" dataHost="localhost4" database="db3"/>
 
-
+	<dataHost name="pre_G_sjzzhhtdb" maxCon="1000" minCon="10" balance="0">
+		<heartbeat>select user()</heartbeat>
+		<writeHost host="hostM1" url="xxx:3306" user="xxx"
+				   password="xxx">
+		</writeHost>
+	</dataHost>
+	
+	<dataHost name="G_plus_old" maxCon="500" minCon="10" balance="0">
+        <heartbeat>select user()</heartbeat>
+        <!-- can have multi write hosts -->
+        <writeHost host="xxxx" url="xxx:3306" user="xxx" password="xxx">
+            <!-- can have multi read hosts -->
+            <!-- <readHost host="hostS1" url="localhost:3307" user="root" password="123456"
+                /> -->
+        </writeHost>
+    </dataHost>
+    
     <dataHost name="localhost1" maxCon="500" minCon="10" balance="0">
         <heartbeat>select user()</heartbeat>
         <!-- can have multi write hosts -->

@@ -82,6 +82,10 @@
               class="com.actiontech.dble.route.function.AutoPartitionByLong">
         <property name="mapFile">autopartition-long.txt</property>
     </function>
+    <function name="rang-long-plus"
+    	class="com.actiontech.dble.route.function.AutoPartitionByMutiCols">
+		<property name="mapFile">autopartition-long-plus.txt</property>
+	</function>
     <function name="rang-long2"
               class="com.actiontech.dble.route.function.AutoPartitionByLong">
         <property name="mapFile">autopartition-long2.txt</property>
