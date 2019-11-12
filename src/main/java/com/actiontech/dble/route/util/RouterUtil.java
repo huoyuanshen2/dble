@@ -548,27 +548,7 @@ public final class RouterUtil {
 					}
 				}
 			}
-			if (globalTables.size() == tableSize) {
-				boolean isFirstTable = true;
-				for (TableConfig tb : globalTables) {
-					if (isFirstTable) {
-						tmpResultNodes.addAll(tb.getDataNodes());
-						isFirstTable = false;
-					} else {
-						tmpResultNodes.retainAll(tb.getDataNodes());
-					}
-				}
-				if (tmpResultNodes.size() != 0) {
-					return getRandomDataNode(new ArrayList<>(tmpResultNodes));
-				} else {
-					return null;
-				}
-			}
-			for (TableConfig tb : globalTables) {
-				tmpResultNodes.retainAll(tb.getDataNodes());
-				tablesSet.remove(tb.getName());
-			}
-			if (tmpResultNodes.size() != 1 || tablesSet.size() != 0) {
+			if (tmpResultNodes.size() != 1 ) {
 				return null;
 			}
 			resultNodes.add(tmpResultNodes.iterator().next());

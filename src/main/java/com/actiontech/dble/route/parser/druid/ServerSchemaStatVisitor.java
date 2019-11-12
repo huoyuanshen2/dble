@@ -257,13 +257,19 @@ public class ServerSchemaStatVisitor extends MySqlSchemaStatVisitor {
                     whereUnits.add(whereUnit);
                 }
                 return false;
-            case Like:
-            case NotLike:
             case NotEqual:
             case GreaterThan:
             case GreaterThanOrEqual:
             case LessThan:
             case LessThanOrEqual:
+            	if (!inSelect && !inOuterJoin) {
+                    handleCondition(x.getLeft(), x.getOperator().name, x.getRight());
+                    handleCondition(x.getRight(), x.getOperator().name, x.getLeft());
+                    handleRelationship(x.getLeft(), x.getOperator().name, x.getRight());
+                }
+                break;
+            case Like:
+            case NotLike:
             default:
                 break;
         }
